@@ -1,123 +1,156 @@
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import javax.swing.JComponent;
+import java.util.*;
 import java.awt.geom.Ellipse2D;
-import java.awt.Rectangle;
+import java.awt.Graphics2D;
+import java.awt.Graphics;
 
+class Board extends JComponent {
+    boolean isRedTurn; //player
+    boolean gameOver; // becomes true after a win
 
-public class Board extends JComponent {
-    private final int columns = 7;
     private final int rows = 6;
-    private final int padding = 130;
-    private final GamePiece[][] slots = new GamePiece[columns][rows];
+    private final int columns = 7;
+    private final int diameter = 90;
+    private GamePiece lastPieceAdded;
 
-    public Board(){
-        for(int i = 0; i < columns; i++){
-            for(int j = 0; j < rows; j++){
-                GamePiece p = new GamePiece(i, j);
-                slots[i][j] = p;
+    //set up array of circle to keep track of status (filled or not filled/ color/ etc.)
+    public GamePiece[][] board = new GamePiece[rows][columns];
+   
+    public Board() {
+        isRedTurn = true;
+        gameOver = false;
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                board[i][j] = new GamePiece(i, j);
             }
         }
+        lastPieceAdded = board[0][0]; //dummy variable
     }
-    public void paintComponent(Graphics g){
+
+    public void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D) g;
 
-        Rectangle rec = new Rectangle (0, 0, 710, 110);
-        g2.setColor(new Color(51, 102, 255));
-        g2.draw(rec);
-        g2.fill(rec);
-        for(int i = 0; i < columns; i++){
-            for(int j = 0; j < rows; j++){
-                GamePiece c = slots[i][j];
+        //draws and fills board with circles
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < columns; j++) {
+                GamePiece test = board[i][j];
 
-                Ellipse2D.Double circle = new Ellipse2D.Double(c.getXCoord(), c.getYCoord() + padding, c.getRadius(), c.getRadius()); 
-                g2.draw(circle);
-                g2.setColor(c.getColor());
+                g2.setColor(test.getColor());
+
+                //TODO print a win statement
+
+                Ellipse2D.Double circle = new Ellipse2D.Double(j * 100 + 5, i * 100 + 10, diameter, diameter);
                 g2.fill(circle);
+                g2.draw(circle);
             }
         }
-    }
-    public GamePiece[][] getSlots(){
-        return slots;
-    }
-    public void updateColor(){
-        repaint();
-    }
-    public void addGamePiece(int column, int player) {
-        for(int i = 5; i > 0; i--) {
-            if(slots[column][i].getPlayer() == 0){
-                slots[column][i].setPlayer(player);
-                repaint();
-                break;
-            }
-        }
-    }
-    public boolean isColumnFull(int column) {
-        int counter = 0;
-        for(int i = 0; i < 6; i++){
-            if(slots[i][column].getPlayer() == 0){
-                continue;
-            } else {
-                counter++;
-            }
-        }
-        return counter == 6;
     }
 
-    public void resetBoard(){
-        for(int i = 0; i < columns; i++){
-            for(int j = 0; j < rows; j++){
-                slots[i][j].setPlayer(0);
-            }
+    //add a piece, declare red or yellow, update last piece added, update player turn
+    public void setGamePiece(int row, int column) {
+        board[row][column].setFilled();
+        if(!isRedTurn){
+            board[row][column].setYellow();
         }
-    }
-     public boolean checkWinner(){
+        lastPieceAdded = board[row][column];
+        isRedTurn = !isRedTurn; // switch player's turn 
+        //isGameOver();
 
-        // horizontal check 
-        for (int j = 0; j < rows - 3 ; j++ ){
-            for (int i = 0; i < columns; i++){
-                int temp = slots[i][j].getPlayer();
-                if (temp != 0 && temp == slots[i][j + 1].getPlayer() && temp == slots[i][j + 2].getPlayer() && temp == slots[i][j + 3].getPlayer()){
-                    return true;
-                }           
-            }
+    }
+   
+
+    public void isGameOver()  {
+        int i = lastPieceAdded.getRow();
+        int j = lastPieceAdded.getColumn();
+
+        ArrayList<GamePiece> tests = new ArrayList<>();// to check win conditions
+
+        //vertical 
+        for (int k = i; k < rows; k++) {
+            tests.add(board[k][j]);
         }
-        //vertical check
-        for (int j = 0; j < rows ; j++ ){
-            for (int i = 0; i < columns - 3; i++){
-                int temp = slots[i][j].getPlayer();
-                if (temp != 0 && temp == slots[i + 1][j].getPlayer() && temp == slots[i + 2][j].getPlayer() && temp == slots[i + 3][j].getPlayer()){
-                    return true;
-                }           
-            }
+        isFourInARow(tests);
+        tests.clear();
+
+        // horizontal 
+        for (int k = 0; k < columns; k++) {
+            tests.add(board[i][k]);
         }
-        // ascendingDiagonalCheck 
-        for (int i = 3; i < rows; i++){
-            for (int j = 0; j < columns - 3; j++){
-                int temp = slots[i][j].getPlayer();
-                if (temp != 0 && temp == slots[i + 1][j + 1].getPlayer() && temp == slots[i + 2][j + 2].getPlayer() && temp == slots[i + 3][j + 3].getPlayer()){
-                    return true;
+        isFourInARow(tests);
+        tests.clear();
+
+        //ascending diagonal
+        
+        int diagonalRow = i;
+        int diagonalColumn = j;
+
+        while(diagonalRow != 5 || diagonalColumn != 0) {
+            diagonalRow++;
+            diagonalColumn--;
+        }
+        
+        while (diagonalRow >= 0 && diagonalColumn <= 6) {
+            tests.add(board[diagonalRow][diagonalColumn]);
+            diagonalRow--;
+            diagonalColumn++;
+        }
+        isFourInARow(tests);
+        tests.clear();
+
+        // descending diagonal 
+        diagonalRow = i;
+        diagonalColumn = j;
+
+        while(diagonalRow != 0 || diagonalColumn != 0) {
+            diagonalRow--;
+            diagonalColumn--;
+        }
+        
+        while (diagonalRow <= 5 && diagonalColumn <= 6) {
+            tests.add(board[diagonalRow][diagonalColumn]);
+            diagonalRow++;
+            diagonalColumn++;
+        }
+        isFourInARow(tests);
+        tests.clear();
+    }
+
+    // check for 4 same colors in a row 
+    public void isFourInARow(ArrayList<GamePiece> test) {
+        if (test.size() >= 4) {
+            int streak = 1; // same streak variable used in horizontal win condition
+            for (int k = 0; k < test.size()-1; k++) {
+                GamePiece current = test.get(k);
+                GamePiece next = test.get(k + 1);
+                if(current.isFilled() && next.isFilled() && current.isRed() == next.isRed()) {
+                    streak++;
+                } else {
+                    streak = 1;
+                }
+                if (streak == 4) {
+                    gameOver = true;
                 }
             }
         }
-        // descendingDiagonalCheck
-        for (int i = 0; i < rows - 3; i++){
-            for (int j = 0; j < columns - 3; j++){
-                int temp = slots[i][j].getPlayer();
-                if (temp != 0 && temp == slots[i - 1][j + 1].getPlayer() && temp == slots[i - 2][j + 2].getPlayer() && temp == slots[i - 3][j + 3].getPlayer()){
-                    return true;
-                }
-            }
-        }
-        return false;
-    } 
-    public void resetGame(){
-        for(int i = 0; i < 6; i++) {
-            for(int j = 0; j < 7; j++){ 
-                slots[i][j].setPlayer(0); 
-            }
-        }
     }
-    
+
+    public GamePiece getGamePiece(int r, int c) {
+        return board[r][c];
+    }
+
+    public boolean getGameOver(){
+        return gameOver;
+    }
+
+    public int getRows(){
+        return rows;
+    }
+
+    public int getColumns(){
+        return columns;
+    }
+
+    public int getDiameter() {
+        return diameter;
+    }
 }

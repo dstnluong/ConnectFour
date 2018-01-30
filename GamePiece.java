@@ -1,45 +1,48 @@
 import java.awt.Color;
-import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.geom.Ellipse2D;
 
 public class GamePiece {
-    private int player;
-    private int xcoord;
-    private int ycoord;
-    private int radius;
+    private boolean filled = false; // true is circle is claimed
+    private boolean isRed = true; //default color is red
+    private int row; // row in the board
+    private int column; // column in the board
 
-    public GamePiece(int xcoord, int ycoord) {
-        player = 0;
-        this.xcoord = xcoord * 100 + 10;
-        this.ycoord = ycoord * 90 + 10;
-        radius = 80;
-    }
-    public int getRadius() {
-        return radius;
-    }
-    public int getXCoord() {
-        return xcoord;
-    }
-    public int getYCoord(){
-        return ycoord;
+    public GamePiece(int row, int column) {
+        this.row = row;
+        this.column = column;
     }
 
-    public int getPlayer() {
-        return player;
+    public int getRow() {
+        return row;
     }
 
-    public void setPlayer(int playerNumber) {
-        player = playerNumber; 
+    public int getColumn() {
+        return column;
     }
 
-    public Color getColor() { //60 95 122
-        switch (player) {
-            case 0: return new Color(255, 255, 255); //white
-            case 1: return new Color(255, 80, 80); // red
-            case 2: return new Color(255, 255, 102); // yellow
-            default: return null;
+    public boolean isFilled() {
+        return filled;   
+    }
+
+    public void setFilled() {
+        filled = true;
+    }
+
+    public void setYellow() {
+        isRed = false;
+    }
+
+    public boolean isRed() {
+        return isRed;
+    }
+    public Color getColor(){
+        if(!filled){
+            return new Color(255,255,255); // white
+        } else{ 
+            if(isRed){
+                return new Color(255, 80, 80); // red
+            } else {
+                return new Color(255, 255, 102);  //yellow
+            }
         }
     }
 }
