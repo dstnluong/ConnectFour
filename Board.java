@@ -45,11 +45,8 @@ class Board extends JComponent {
             for (int j = 0; j < columns; j++) {
                 GamePiece test = board[i][j];
 
-                g2.setColor(test.getColor());
-
-                //TODO print a win statement
-
                 Ellipse2D.Double circle = new Ellipse2D.Double(j * 100 + 5, i * 100 + 10 + 80, diameter, diameter);
+                g2.setColor(test.getColor());
                 g2.fill(circle);
                 g2.draw(circle);
             }
@@ -154,7 +151,6 @@ class Board extends JComponent {
             diagonalRow--;
             diagonalColumn--;
         }
-        
         while (diagonalRow < rows && diagonalColumn < columns) {
             tests.add(board[diagonalRow][diagonalColumn]);
             diagonalRow++;
