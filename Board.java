@@ -1,11 +1,13 @@
-import javax.swing.JComponent;
 import java.util.ArrayList;
+import java.util.Random;
+
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.geom.Ellipse2D;
 import java.awt.Graphics2D;
 import java.awt.Graphics;
-import java.util.Random;
+
+import javax.swing.JComponent;
 
 class Board extends JComponent {
     boolean isRedTurn; //player
@@ -109,6 +111,7 @@ class Board extends JComponent {
         isRedTurn = !isRedTurn; //loser goes first
         repaint();
     }
+    
     //check if there is a winner
     public void isGameOver()  {
         int i = lastPieceAdded.getRow();

@@ -1,10 +1,8 @@
-import java.awt.Font;
 import java.awt.Color;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-
 
 import javax.swing.JFrame;
 import javax.swing.JButton;
@@ -17,11 +15,8 @@ public class main {
     private final int titlePanelHeight = 150;
     private final int frameWidth = 700;
     private final int frameHeight = 600 + titlePanelHeight;
-    private boolean winsUpdated;
-    private Player player1, player2;
     public main(){
         JFrame frame = new JFrame();
-        winsUpdated = false;
         frame.setSize(frameWidth,frameHeight);
         frame.setTitle("ConnectFour");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -44,14 +39,13 @@ public class main {
                 }
             }
         });
-        
+
         //resets the game, must press to resume after a game ends
         JButton newGame = new JButton("New Game");
         newGame.setBounds(303, 60, 95, 30);
         newGame.addActionListener(new ActionListener(){
             public void actionPerformed(ActionEvent e){
                 connect.newGame();
-                winsUpdated = false;
             }
         });
 
