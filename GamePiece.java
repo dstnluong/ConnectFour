@@ -11,6 +11,10 @@ public class GamePiece {
         this.column = column;
     }
 
+    public void resetPiece(){
+        filled = false;
+        isRed = true;
+    }
     public int getRow() {
         return row;
     }
